@@ -1,15 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Delete Post</title>
-</head>
-<body>
-    <a href="{% url 'post_detail' post.id %}">&larr; Back to post</a>
-    <h1>Delete "{{ post.title }}"?</h1>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Yes, delete</button>
-    </form>
-</body>
-</html>
+{% extends "blog/base.html" %}
+
+{% block title %}Delete Post{% endblock %}
+
+{% block content %}
+    <a href="{% url 'post_detail' post.id %}" class="text-sm text-blue-600 hover:underline">&larr; Back to post</a>
+
+    <div class="mt-4 bg-white border border-gray-200 rounded-lg p-6">
+        <h1 class="text-2xl font-bold text-gray-900">Delete "{{ post.title }}"?</h1>
+        <p class="mt-2 text-gray-600">This action cannot be undone.</p>
+
+        <form method="post" class="mt-6 flex gap-3">
+            {% csrf_token %}
+            <button type="submit"
+                    class="px-4 py-2 text-sm font-medium rounded-md bg-red-600 text-white hover:bg-red-700 transition">
+                Yes, delete
+            </button>
+            <a href="{% url 'post_detail' post.id %}"
+               class="px-4 py-2 text-sm font-medium rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
+                Cancel
+            </a>
+        </form>
+    </div>
+{% endblock %}

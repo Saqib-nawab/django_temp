@@ -1,16 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{% if post %}Edit Post{% else %}New Post{% endif %}</title>
-</head>
-<body>
-    <a href="{% url 'post_list' %}">&larr; Back to all posts</a>
-    <h1>{% if post %}Edit Post{% else %}New Post{% endif %}</h1>
-    <form method="post">
+{% extends "blog/base.html" %}
+
+{% block title %}{% if post %}Edit Post{% else %}New Post{% endif %}{% endblock %}
+
+{% block content %}
+    <a href="{% url 'post_list' %}" class="text-sm text-blue-600 hover:underline">&larr; Back to all posts</a>
+
+    <h1 class="mt-4 text-3xl font-bold text-gray-900">
+        {% if post %}Edit Post{% else %}New Post{% endif %}
+    </h1>
+
+    <form method="post" class="mt-6 bg-white border border-gray-200 rounded-lg p-6 space-y-5">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save</button>
+
+        {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ field.errors|join:", " }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit"
+                class="px-4 py-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
+            Save
+        </button>
     </form>
-</body>
-</html>
+{% endblock %}

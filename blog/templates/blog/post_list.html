@@ -1,21 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Blog</title>
-</head>
-<body>
-    <h1>Blog Posts</h1>
-    <p><a href="{% url 'post_create' %}">+ New Post</a></p>
-    <ul>
+{% extends "blog/base.html" %}
+
+{% block title %}Blog Posts{% endblock %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold text-gray-900 mb-6">Blog Posts</h1>
+
+    <div class="space-y-4">
         {% for post in posts %}
-            <li>
-                <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
-                <small>({{ post.created_at }})</small>
-            </li>
+            <a href="{% url 'post_detail' post.id %}"
+               class="block bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md hover:border-blue-300 transition">
+                <h2 class="text-xl font-semibold text-gray-900">{{ post.title }}</h2>
+                <p class="mt-1 text-sm text-gray-500">{{ post.created_at|date:"M d, Y \a\t H:i" }}</p>
+                <p class="mt-2 text-gray-600 line-clamp-2">{{ post.content }}</p>
+            </a>
         {% empty %}
-            <li>No posts yet.</li>
+            <div class="text-center py-12 bg-white border border-dashed border-gray-300 rounded-lg">
+                <p class="text-gray-500">No posts yet.</p>
+                <a href="{% url 'post_create' %}" class="mt-2 inline-block text-blue-600 hover:underline">
+                    Create the first one
+                </a>
+            </div>
         {% endfor %}
-    </ul>
-</body>
-</html>
+    </div>
+{% endblock %}
