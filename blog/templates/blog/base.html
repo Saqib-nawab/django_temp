@@ -10,10 +10,25 @@
     <header class="bg-white border-b border-gray-200">
         <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
             <a href="{% url 'post_list' %}" class="text-xl font-bold text-gray-900">Django Blog</a>
-            <a href="{% url 'post_create' %}"
-               class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
-                + New Post
-            </a>
+            <div class="flex items-center gap-3 text-sm">
+                {% if user.is_authenticated %}
+                    <span class="text-gray-600">Hi, {{ user.username }}</span>
+                    <a href="{% url 'post_create' %}"
+                       class="inline-flex items-center px-3 py-1.5 font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
+                        + New Post
+                    </a>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="text-gray-600 hover:text-gray-900 transition">Log Out</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-gray-600 hover:text-gray-900 transition">Log In</a>
+                    <a href="{% url 'signup' %}"
+                       class="inline-flex items-center px-3 py-1.5 font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
+                        Sign Up
+                    </a>
+                {% endif %}
+            </div>
         </div>
     </header>
 

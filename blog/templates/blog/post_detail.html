@@ -7,18 +7,22 @@
 
     <article class="mt-4 bg-white border border-gray-200 rounded-lg p-6">
         <h1 class="text-3xl font-bold text-gray-900">{{ post.title }}</h1>
-        <p class="mt-1 text-sm text-gray-500">{{ post.created_at|date:"M d, Y \a\t H:i" }}</p>
+        <p class="mt-1 text-sm text-gray-500">
+            By {{ post.author.username }} &middot; {{ post.created_at|date:"M d, Y \a\t H:i" }}
+        </p>
         <p class="mt-4 text-gray-700 whitespace-pre-line leading-relaxed">{{ post.content }}</p>
 
-        <div class="mt-6 flex gap-3 border-t border-gray-100 pt-4">
-            <a href="{% url 'post_update' post.id %}"
-               class="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
-                Edit
-            </a>
-            <a href="{% url 'post_delete' post.id %}"
-               class="px-3 py-1.5 text-sm font-medium rounded-md border border-red-300 text-red-600 hover:bg-red-50 transition">
-                Delete
-            </a>
-        </div>
+        {% if user == post.author %}
+            <div class="mt-6 flex gap-3 border-t border-gray-100 pt-4">
+                <a href="{% url 'post_update' post.id %}"
+                   class="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
+                    Edit
+                </a>
+                <a href="{% url 'post_delete' post.id %}"
+                   class="px-3 py-1.5 text-sm font-medium rounded-md border border-red-300 text-red-600 hover:bg-red-50 transition">
+                    Delete
+                </a>
+            </div>
+        {% endif %}
     </article>
 {% endblock %}
