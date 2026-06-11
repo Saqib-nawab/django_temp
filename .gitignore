@@ -1,0 +1,30 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Environment variables / secrets
+.env
+*.env
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Testing / coverage
+.coverage
+htmlcov/
+.pytest_cache/

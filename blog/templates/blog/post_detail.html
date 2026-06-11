@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ post.title }}</title>
+</head>
+<body>
+    <a href="{% url 'post_list' %}">&larr; Back to all posts</a>
+    <h1>{{ post.title }}</h1>
+    <p><small>{{ post.created_at }}</small></p>
+    <p>{{ post.content }}</p>
+</body>
+</html>
