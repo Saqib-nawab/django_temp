@@ -6,6 +6,7 @@
 </head>
 <body>
     <h1>Blog Posts</h1>
+    <p><a href="{% url 'post_create' %}">+ New Post</a></p>
     <ul>
         {% for post in posts %}
             <li>
