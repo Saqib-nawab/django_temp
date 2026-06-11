@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>New Post</title>
+    <title>{% if post %}Edit Post{% else %}New Post{% endif %}</title>
 </head>
 <body>
     <a href="{% url 'post_list' %}">&larr; Back to all posts</a>
-    <h1>New Post</h1>
+    <h1>{% if post %}Edit Post{% else %}New Post{% endif %}</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
