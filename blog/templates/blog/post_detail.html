@@ -5,24 +5,102 @@
 {% block content %}
     <a href="{% url 'post_list' %}" class="text-sm text-blue-600 hover:underline">&larr; Back to all posts</a>
 
-    <article class="mt-4 bg-white border border-gray-200 rounded-lg p-6">
-        <h1 class="text-3xl font-bold text-gray-900">{{ post.title }}</h1>
-        <p class="mt-1 text-sm text-gray-500">
-            By {{ post.author.username }} &middot; {{ post.created_at|date:"M d, Y \a\t H:i" }}
-        </p>
-        <p class="mt-4 text-gray-700 whitespace-pre-line leading-relaxed">{{ post.content }}</p>
-
-        {% if user == post.author %}
-            <div class="mt-6 flex gap-3 border-t border-gray-100 pt-4">
-                <a href="{% url 'post_update' post.id %}"
-                   class="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
-                    Edit
-                </a>
-                <a href="{% url 'post_delete' post.id %}"
-                   class="px-3 py-1.5 text-sm font-medium rounded-md border border-red-300 text-red-600 hover:bg-red-50 transition">
-                    Delete
-                </a>
-            </div>
+    <article class="mt-4 bg-white border border-gray-200 rounded-lg overflow-hidden">
+        {% if post.image %}
+            <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full max-h-96 object-cover">
         {% endif %}
+        <div class="p-6">
+            <div class="flex items-center gap-2 text-xs">
+                {% if post.category %}
+                    <a href="{% url 'post_list' %}?category={{ post.category.slug }}"
+                       class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium hover:bg-blue-200 transition">{{ post.category.name }}</a>
+                {% endif %}
+                {% if post.status == "draft" %}
+                    <span class="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-medium">Draft — only you can see this</span>
+                {% endif %}
+            </div>
+
+            <h1 class="mt-2 text-3xl font-bold text-gray-900">{{ post.title }}</h1>
+            <p class="mt-1 text-sm text-gray-500">
+                By {{ post.author.username }} &middot; {{ post.created_at|date:"M d, Y \a\t H:i" }}
+                {% if post.updated_at|date:"U" != post.created_at|date:"U" %}
+                    &middot; updated {{ post.updated_at|date:"M d, Y" }}
+                {% endif %}
+            </p>
+
+            {% if post.tags.all %}
+                <div class="mt-3 flex flex-wrap gap-1.5">
+                    {% for tag in post.tags.all %}
+                        <a href="{% url 'post_list' %}?tag={{ tag.slug }}"
+                           class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition">#{{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <p class="mt-4 text-gray-700 whitespace-pre-line leading-relaxed">{{ post.content }}</p>
+
+            <div class="mt-6 flex items-center gap-3 border-t border-gray-100 pt-4">
+                {% if user.is_authenticated and post.status == "published" %}
+                    <form method="post" action="{% url 'post_like' post.id %}">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="px-3 py-1.5 text-sm font-medium rounded-md border transition
+                                       {% if user_has_liked %}border-red-300 bg-red-50 text-red-600 hover:bg-red-100{% else %}border-gray-300 text-gray-700 hover:bg-gray-50{% endif %}">
+                            &#10084; {{ post.likes.count }} {% if user_has_liked %}Liked{% else %}Like{% endif %}
+                        </button>
+                    </form>
+                {% else %}
+                    <span class="px-3 py-1.5 text-sm text-gray-500">&#10084; {{ post.likes.count }} likes</span>
+                {% endif %}
+
+                {% if user == post.author %}
+                    <a href="{% url 'post_update' post.id %}"
+                       class="px-3 py-1.5 text-sm font-medium rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
+                        Edit
+                    </a>
+                    <a href="{% url 'post_delete' post.id %}"
+                       class="px-3 py-1.5 text-sm font-medium rounded-md border border-red-300 text-red-600 hover:bg-red-50 transition">
+                        Delete
+                    </a>
+                {% endif %}
+            </div>
+        </div>
     </article>
+
+    {% if post.status == "published" %}
+        <section class="mt-8">
+            <h2 class="text-xl font-semibold text-gray-900">Comments ({{ comments|length }})</h2>
+
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'comment_create' post.id %}"
+                      class="mt-4 bg-white border border-gray-200 rounded-lg p-4">
+                    {% csrf_token %}
+                    {{ comment_form.body }}
+                    <button type="submit"
+                            class="mt-3 px-4 py-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
+                        Post Comment
+                    </button>
+                </form>
+            {% else %}
+                <p class="mt-4 text-sm text-gray-500">
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="text-blue-600 hover:underline">Log in</a>
+                    to join the discussion.
+                </p>
+            {% endif %}
+
+            <div class="mt-4 space-y-3">
+                {% for comment in comments %}
+                    <div class="bg-white border border-gray-200 rounded-lg p-4">
+                        <p class="text-sm font-medium text-gray-900">
+                            {{ comment.author.username }}
+                            <span class="font-normal text-gray-400">&middot; {{ comment.created_at|date:"M d, Y \a\t H:i" }}</span>
+                        </p>
+                        <p class="mt-1 text-gray-700 whitespace-pre-line">{{ comment.body }}</p>
+                    </div>
+                {% empty %}
+                    <p class="text-sm text-gray-500">No comments yet. Be the first!</p>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
 {% endblock %}

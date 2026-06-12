@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Post
+from .models import Comment, Post
 
 
 INPUT_CLASSES = (
@@ -13,8 +13,33 @@ INPUT_CLASSES = (
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ["title", "content"]
+        fields = ["title", "content", "image", "category", "tags", "status"]
         widgets = {
             "title": forms.TextInput(attrs={"class": INPUT_CLASSES}),
             "content": forms.Textarea(attrs={"class": INPUT_CLASSES, "rows": 8}),
+            "image": forms.ClearableFileInput(
+                attrs={"class": "mt-1 block w-full text-sm text-gray-600"}
+            ),
+            "category": forms.Select(attrs={"class": INPUT_CLASSES}),
+            "tags": forms.SelectMultiple(attrs={"class": INPUT_CLASSES, "size": 4}),
+            "status": forms.Select(attrs={"class": INPUT_CLASSES}),
         }
+        help_texts = {
+            "tags": "Hold Cmd/Ctrl to select multiple tags.",
+        }
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["body"]
+        widgets = {
+            "body": forms.Textarea(
+                attrs={
+                    "class": INPUT_CLASSES,
+                    "rows": 3,
+                    "placeholder": "Write a comment…",
+                }
+            ),
+        }
+        labels = {"body": ""}

@@ -3,23 +3,46 @@
 {% block title %}Blog Posts{% endblock %}
 
 {% block content %}
-    <h1 class="text-3xl font-bold text-gray-900 mb-6">Blog Posts</h1>
+    <div class="flex items-baseline justify-between">
+        <h1 class="text-3xl font-bold text-gray-900">
+            {% if query %}Results for &ldquo;{{ query }}&rdquo;
+            {% elif active_tag %}Posts tagged #{{ active_tag.name }}
+            {% elif active_category %}{{ active_category.name }} posts
+            {% else %}Blog Posts{% endif %}
+        </h1>
+        {% if query or active_tag or active_category %}
+            <a href="{% url 'post_list' %}" class="text-sm text-blue-600 hover:underline">Clear filters</a>
+        {% endif %}
+    </div>
 
-    <div class="space-y-4">
-        {% for post in posts %}
-            <a href="{% url 'post_detail' post.id %}"
-               class="block bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md hover:border-blue-300 transition">
-                <h2 class="text-xl font-semibold text-gray-900">{{ post.title }}</h2>
-                <p class="mt-1 text-sm text-gray-500">{{ post.created_at|date:"M d, Y \a\t H:i" }}</p>
-                <p class="mt-2 text-gray-600 line-clamp-2">{{ post.content }}</p>
-            </a>
-        {% empty %}
-            <div class="text-center py-12 bg-white border border-dashed border-gray-300 rounded-lg">
-                <p class="text-gray-500">No posts yet.</p>
-                <a href="{% url 'post_create' %}" class="mt-2 inline-block text-blue-600 hover:underline">
-                    Create the first one
+    {% if categories %}
+        <div class="mt-4 flex flex-wrap gap-2">
+            {% for category in categories %}
+                <a href="{% url 'post_list' %}?category={{ category.slug }}"
+                   class="px-3 py-1 text-xs rounded-full border transition
+                          {% if active_category == category %}bg-blue-600 text-white border-blue-600{% else %}bg-white text-gray-600 border-gray-300 hover:border-blue-400{% endif %}">
+                    {{ category.name }} ({{ category.num_posts }})
                 </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="mt-6 grid gap-5 sm:grid-cols-2">
+        {% for post in posts %}
+            {% include "blog/_post_card.html" %}
+        {% empty %}
+            <div class="sm:col-span-2 text-center py-12 bg-white border border-dashed border-gray-300 rounded-lg">
+                <p class="text-gray-500">
+                    {% if query or active_tag or active_category %}No posts match your search.{% else %}No posts yet.{% endif %}
+                </p>
+                {% if not query and not active_tag and not active_category %}
+                    <a href="{% url 'post_create' %}" class="mt-2 inline-block text-blue-600 hover:underline">
+                        Create the first one
+                    </a>
+                {% endif %}
             </div>
         {% endfor %}
     </div>
+
+    {% include "blog/_pagination.html" %}
 {% endblock %}

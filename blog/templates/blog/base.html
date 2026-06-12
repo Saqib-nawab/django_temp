@@ -8,11 +8,17 @@
 </head>
 <body class="bg-gray-50 min-h-screen text-gray-800">
     <header class="bg-white border-b border-gray-200">
-        <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
             <a href="{% url 'post_list' %}" class="text-xl font-bold text-gray-900">Django Blog</a>
+
+            <form method="get" action="{% url 'post_list' %}" class="order-last w-full sm:order-none sm:w-auto sm:flex-1 sm:max-w-xs">
+                <input type="search" name="q" value="{{ query|default:'' }}" placeholder="Search posts…"
+                       class="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+            </form>
+
             <div class="flex items-center gap-3 text-sm">
                 {% if user.is_authenticated %}
-                    <span class="text-gray-600">Hi, {{ user.username }}</span>
+                    <a href="{% url 'my_posts' %}" class="text-gray-600 hover:text-gray-900 transition">My Posts</a>
                     <a href="{% url 'post_create' %}"
                        class="inline-flex items-center px-3 py-1.5 font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 transition">
                         + New Post
@@ -32,8 +38,12 @@
         </div>
     </header>
 
-    <main class="max-w-3xl mx-auto px-4 py-8">
+    <main class="max-w-4xl mx-auto px-4 py-8">
         {% block content %}{% endblock %}
     </main>
+
+    <footer class="max-w-4xl mx-auto px-4 py-6 text-center text-xs text-gray-400 border-t border-gray-200">
+        Django Blog &middot; <a href="/api/docs/" class="hover:text-gray-600">REST API docs</a>
+    </footer>
 </body>
 </html>

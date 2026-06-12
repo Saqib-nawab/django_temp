@@ -9,7 +9,7 @@
         {% if post %}Edit Post{% else %}New Post{% endif %}
     </h1>
 
-    <form method="post" class="mt-6 bg-white border border-gray-200 rounded-lg p-6 space-y-5">
+    <form method="post" enctype="multipart/form-data" class="mt-6 bg-white border border-gray-200 rounded-lg p-6 space-y-5">
         {% csrf_token %}
 
         {% for field in form %}
@@ -18,6 +18,9 @@
                     {{ field.label }}
                 </label>
                 {{ field }}
+                {% if field.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ field.help_text }}</p>
+                {% endif %}
                 {% if field.errors %}
                     <p class="mt-1 text-sm text-red-600">{{ field.errors|join:", " }}</p>
                 {% endif %}

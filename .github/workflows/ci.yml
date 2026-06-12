@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: blog_test
+          POSTGRES_USER: blog
+          POSTGRES_PASSWORD: blog
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U blog"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgres://blog:blog@localhost:5432/blog_test
+      DJANGO_SECRET_KEY: ci-only-secret-key
+      DJANGO_DEBUG: "false"
+      DJANGO_SECURE_SSL_REDIRECT: "false"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run system checks
+        run: python manage.py check
+
+      - name: Verify migrations are up to date
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput
+
+      - name: Run tests
+        run: python manage.py test --verbosity 2
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t django-blog:ci .
